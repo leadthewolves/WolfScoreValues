@@ -550,7 +550,8 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="window.print()">Save as PDF</button>
+      <button class="btn btn-accent" onclick="sendWhatsApp()">📲 Send results to adviser</button>
+      <button class="btn btn-primary" onclick="window.print()">Save as PDF</button>
       <button class="btn btn-ghost" onclick="restart()">Start over</button>
     </div>
 
@@ -765,6 +766,21 @@ function goResults() {
   setTimeout(() => {
     document.querySelectorAll(".bar-fill").forEach(b => { b.style.width = b.style.width; });
   }, 100);
+}
+
+function sendWhatsApp() {
+  const top = VALUES.find(x => x.id === ranked[0]);
+  const profile = PROFILES[ranked[0]] || "Financial planner";
+  const avgScore = Math.round(ranked.reduce((a, id) => a + (scores[id] || 5), 0) / ranked.length);
+  const valueLines = ranked.map((id, i) => {
+    const v = VALUES.find(x => x.id === id);
+    return `${i+1}. ${v.emoji} ${v.label} — ${scores[id]||5}/10`;
+  }).join("\n");
+
+  const msg = `Hi Nigel! I just completed the WolfScore Values Assessment 🐺\n\n*My Profile:* ${profile}\n*Top Value:* ${top.emoji} ${top.label}\n*Avg Alignment:* ${avgScore}/10\n\n*My Values (ranked):*\n${valueLines}\n\nWould love to chat about what this means for my financial plan!`;
+
+  const url = `https://wa.me/6581277721?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
 }
 
 function restart() {
