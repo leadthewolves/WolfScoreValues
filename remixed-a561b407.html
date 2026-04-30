@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Values — Know What Drives You</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a18;
+    --ink-soft: #5a5a55;
+    --ink-faint: #9a9a94;
+    --paper: #f7f5f0;
+    --paper-warm: #eceae3;
+    --paper-card: #ffffff;
+    --accent: #2d5f3f;
+    --accent-light: #e8f0eb;
+    --accent-mid: #4a8a60;
+    --gold: #b8860b;
+    --gold-light: #fdf6e3;
+    --danger-light: #fdf0e8;
+    --danger: #c85a1a;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+    --shadow-hover: 0 6px 24px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .page-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 40px; }
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .progress-step {
+    flex: 1;
+    height: 3px;
+    background: var(--paper-warm);
+    border-radius: 2px;
+    transition: background 0.4s ease;
+  }
+  .progress-step.done { background: var(--accent); }
+  .progress-step.active { background: var(--accent-mid); }
+  .progress-label {
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+  .progress-label strong { color: var(--ink-soft); font-weight: 500; }
+
+  /* Screen transitions */
+  .screen { display: none; }
+  .screen.active {
+    display: block;
+    animation: screenIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Typography */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 38px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    max-width: 520px;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    font-weight: 300;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-primary:hover { background: #333330; transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+  .btn-primary:disabled { background: var(--paper-warm); color: var(--ink-faint); cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--paper-warm);
+  }
+  .btn-ghost:hover { background: var(--paper-warm); color: var(--ink); }
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-accent:hover { background: var(--accent-mid); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 28px; }
+
+  /* Value Grid */
+  .sel-counter {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .sel-counter strong { color: var(--ink); }
+
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .value-card {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    text-align: center;
+  }
+  .value-card:hover {
+    border-color: var(--accent-mid);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .value-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(45,95,63,0.1);
+  }
+  .value-card.selected .vc-label { color: var(--accent); }
+  .vc-emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+  .vc-label { font-size: 13px; font-weight: 500; color: var(--ink); display: block; }
+  .vc-hint { font-size: 11px; color: var(--ink-faint); margin-top: 3px; display: block; line-height: 1.4; }
+
+  /* Rank list */
+  .rank-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .rank-item {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: box-shadow 0.2s;
+  }
+  .rank-item:hover { box-shadow: var(--shadow); }
+  .rank-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--paper-warm);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+  }
+  .rank-num.top1 { background: var(--gold-light); color: var(--gold); }
+  .rank-num.top2 { background: var(--accent-light); color: var(--accent); }
+  .rank-emoji { font-size: 20px; flex-shrink: 0; }
+  .rank-name { font-size: 14px; font-weight: 500; flex: 1; }
+  .rank-hint { font-size: 12px; color: var(--ink-faint); }
+  .rank-arrows { display: flex; flex-direction: column; gap: 2px; }
+  .arrow-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-faint);
+    font-size: 13px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+  }
+  .arrow-btn:hover { color: var(--ink); background: var(--paper-warm); }
+  .arrow-btn:disabled { opacity: 0.2; cursor: default; }
+
+  /* Score sliders */
+  .score-card {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .score-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .score-emoji { font-size: 20px; }
+  .score-name { font-size: 15px; font-weight: 500; }
+  .score-rank-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    background: var(--paper-warm);
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--paper-warm);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    cursor: pointer;
+    border: none;
+  }
+  .slider-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    min-width: 28px;
+    text-align: right;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  /* Results */
+  .results-hero {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .results-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(45,95,63,0.3);
+  }
+  .results-hero-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(247,245,240,0.5); margin-bottom: 8px; }
+  .results-hero-title { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.2; margin-bottom: 6px; }
+  .results-hero-sub { font-size: 13px; color: rgba(247,245,240,0.6); font-weight: 300; }
+
+  .metrics-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  @media (max-width: 480px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+  .metric-card {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .metric-label { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .metric-value { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); }
+  .metric-note { font-size: 11px; color: var(--ink-faint); margin-top: 3px; line-height: 1.4; }
+
+  .section-card {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .section-card-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 16px; }
+
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .bar-emoji { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+  .bar-label { font-size: 13px; font-weight: 500; width: 110px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 5px; background: var(--paper-warm); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+  .bar-fill.gold { background: var(--gold); }
+  .bar-score { font-size: 12px; color: var(--ink-soft); width: 32px; text-align: right; flex-shrink: 0; font-weight: 500; }
+
+  .gap-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--paper-warm);
+  }
+  .gap-row:last-child { border-bottom: none; }
+  .gap-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 1px;
+  }
+  .gap-dot.aligned { background: var(--accent-light); color: var(--accent); }
+  .gap-dot.gap { background: var(--danger-light); color: var(--danger); }
+  .gap-text { font-size: 13px; line-height: 1.5; }
+  .gap-text strong { font-weight: 500; }
+  .gap-sub { font-size: 12px; color: var(--ink-faint); }
+
+  .disclaimer {
+    font-size: 11px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--paper-warm);
+  }
+
+  /* Intro screen */
+  .intro-graphic {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .intro-chip {
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .intro-chip span { font-size: 16px; }
+
+  .step-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
+  .step-row { display: flex; align-items: flex-start; gap: 14px; }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--paper-card);
+    border: 1.5px solid var(--paper-warm);
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-text { font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+  .step-text strong { color: var(--ink); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="logo">Wolf<span>Score</span></div>
+    <div class="badge">Values Assessment</div>
+    <!-- claude.ai badge hidden -->
+  </header>
+
+  <!-- Screen 0: Intro -->
+  <div class="screen active" id="s0">
+    <div class="eyebrow">Financial clarity starts here</div>
+    <h1>What <em>really</em> drives your money decisions?</h1>
+    <p class="subtitle">Most financial plans fail not because of bad numbers — but because they're not built around what you actually care about. This 3-step assessment changes that.</p>
+
+    <div class="intro-graphic">
+      <div class="intro-chip"><span>🛡️</span> Security</div>
+      <div class="intro-chip"><span>🌏</span> Freedom</div>
+      <div class="intro-chip"><span>📈</span> Growth</div>
+      <div class="intro-chip"><span>👨‍👩‍👧</span> Family</div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Pick your values</strong> — Choose up to 5 from 12 universal financial values</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Rank by priority</strong> — What matters most to you right now?</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Rate your life</strong> — How well does your current situation reflect each value?</div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top: 0;">
+      <button class="btn btn-accent" onclick="goScreen(1)">Start your assessment →</button>
+    </div>
+  </div>
+
+  <!-- Screen 1: Pick values -->
+  <div class="screen" id="s1">
+    <div class="eyebrow">Step 1 of 3</div>
+    <h2>Pick your values</h2>
+    <p class="section-sub">Choose the values that feel most true to you — up to 5. Trust your gut, not what you think you "should" choose.</p>
+    <div class="sel-counter">Selected: <strong id="selCount">0</strong> / 5</div>
+    <div class="value-grid" id="valueGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn1" onclick="goRank()" disabled>Rank my values →</button>
+      <button class="btn btn-ghost" onclick="goScreen(0)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Rank -->
+  <div class="screen" id="s2">
+    <div class="eyebrow">Step 2 of 3</div>
+    <h2>Rank by priority</h2>
+    <p class="section-sub">Use the arrows to order your values from most to least important. Your #1 will anchor your financial profile.</p>
+    <div class="rank-list" id="rankList"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goScore()">Rate my alignment →</button>
+      <button class="btn btn-ghost" onclick="goScreen(1)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Score -->
+  <div class="screen" id="s3">
+    <div class="eyebrow">Step 3 of 3</div>
+    <h2>Rate your alignment</h2>
+    <p class="section-sub">For each value, score how well your current financial life honours it. 1 = not at all, 10 = completely.</p>
+    <div id="scoreList"></div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="goResults()">See my results →</button>
+      <button class="btn btn-ghost" onclick="goScreen(2)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Screen 4: Results -->
+  <div class="screen" id="s4">
+    <div class="results-hero" id="resultsHero">
+      <div class="results-hero-label">Your financial values profile</div>
+      <div class="results-hero-title" id="heroTitle">—</div>
+      <div class="results-hero-sub" id="heroSub">—</div>
+    </div>
+
+    <div class="metrics-row" id="metricsRow"></div>
+
+    <div class="section-card">
+      <div class="section-card-title">Priority map</div>
+      <div id="priorityBars"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-title">Top 3 alignment check</div>
+      <div id="gapCheck"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="window.print()">Save as PDF</button>
+      <button class="btn btn-ghost" onclick="restart()">Start over</button>
+    </div>
+
+    <div class="disclaimer">
+      This assessment is for educational purposes only and does not constitute financial advice. All financial decisions should be made in consultation with a licensed financial adviser. Finexis Advisory Pte Ltd — MAS Licensed Financial Adviser.
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap" style="margin-top: 40px;">
+    <div class="progress-steps" id="progressSteps">
+      <div class="progress-step" id="ps0"></div>
+      <div class="progress-step" id="ps1"></div>
+      <div class="progress-step" id="ps2"></div>
+      <div class="progress-step" id="ps3"></div>
+    </div>
+    <div class="progress-label" id="progressLabel"></div>
+  </div>
+
+</div>
+
+<script>
+const VALUES = [
+  { id: "security", emoji: "🛡️", label: "Security", hint: "A stable safety net" },
+  { id: "freedom", emoji: "🌏", label: "Freedom", hint: "Choices without stress" },
+  { id: "family", emoji: "👨‍👩‍👧", label: "Family", hint: "Protecting those I love" },
+  { id: "growth", emoji: "📈", label: "Growth", hint: "Building long-term wealth" },
+  { id: "experiences", emoji: "✈️", label: "Experiences", hint: "Travel, memories, lifestyle" },
+  { id: "legacy", emoji: "🏛️", label: "Legacy", hint: "Leaving something behind" },
+  { id: "independence", emoji: "🔑", label: "Independence", hint: "Not relying on others" },
+  { id: "health", emoji: "❤️", label: "Health", hint: "Funding wellbeing & care" },
+  { id: "purpose", emoji: "🎯", label: "Purpose", hint: "Work that means something" },
+  { id: "simplicity", emoji: "🌿", label: "Simplicity", hint: "Less stress, less complexity" },
+  { id: "impact", emoji: "💡", label: "Impact", hint: "Giving back & contributing" },
+  { id: "early_exit", emoji: "⏳", label: "Early exit", hint: "Option to retire early" },
+];
+
+const PROFILES = {
+  security: "The stability-first planner",
+  freedom: "The freedom-focused planner",
+  family: "The family protector",
+  growth: "The wealth builder",
+  experiences: "The life-led planner",
+  legacy: "The legacy builder",
+  independence: "The self-reliant planner",
+  health: "The health-conscious planner",
+  purpose: "The purpose-driven planner",
+  simplicity: "The simplicity seeker",
+  impact: "The impact-oriented planner",
+  early_exit: "The early-exit planner",
+};
+
+let selected = [], ranked = [], scores = {};
+let currentScreen = 0;
+
+const STEP_LABELS = ["Introduction","Pick values","Rank priorities","Rate alignment","Your results"];
+
+function updateProgress(n) {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById("ps" + i);
+    el.className = "progress-step" + (i < n ? " done" : i === n ? " active" : "");
+  }
+  document.getElementById("progressLabel").innerHTML =
+    `<strong>${STEP_LABELS[n]}</strong> &nbsp;·&nbsp; Step ${n} of 4`;
+  document.getElementById("progressWrap").style.display = n === 0 ? "none" : "block";
+}
+
+function goScreen(n) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("s" + n).classList.add("active");
+  currentScreen = n;
+  updateProgress(n);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Init grid
+function initGrid() {
+  const g = document.getElementById("valueGrid");
+  g.innerHTML = VALUES.map(v => `
+    <div class="value-card" id="vc_${v.id}" onclick="toggleValue('${v.id}')">
+      <span class="vc-emoji">${v.emoji}</span>
+      <span class="vc-label">${v.label}</span>
+      <span class="vc-hint">${v.hint}</span>
+    </div>
+  `).join("");
+}
+
+function toggleValue(id) {
+  const idx = selected.indexOf(id);
+  if (idx > -1) {
+    selected.splice(idx, 1);
+  } else {
+    if (selected.length >= 5) return;
+    selected.push(id);
+  }
+  VALUES.forEach(v => {
+    document.getElementById("vc_" + v.id).classList.toggle("selected", selected.includes(v.id));
+  });
+  document.getElementById("selCount").textContent = selected.length;
+  document.getElementById("btn1").disabled = selected.length < 2;
+}
+
+function goRank() {
+  ranked = [...selected];
+  renderRank();
+  goScreen(2);
+}
+
+function renderRank() {
+  document.getElementById("rankList").innerHTML = ranked.map((id, i) => {
+    const v = VALUES.find(x => x.id === id);
+    const numClass = i === 0 ? "rank-num top1" : i === 1 ? "rank-num top2" : "rank-num";
+    return `<div class="rank-item">
+      <div class="${numClass}">${i + 1}</div>
+      <span class="rank-emoji">${v.emoji}</span>
+      <div style="flex:1">
+        <div class="rank-name">${v.label}</div>
+        <div class="rank-hint">${v.hint}</div>
+      </div>
+      <div class="rank-arrows">
+        <button class="arrow-btn" onclick="moveRank(${i},-1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button class="arrow-btn" onclick="moveRank(${i},1)" ${i === ranked.length - 1 ? 'disabled' : ''}>▼</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function moveRank(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= ranked.length) return;
+  [ranked[i], ranked[j]] = [ranked[j], ranked[i]];
+  renderRank();
+}
+
+function goScore() {
+  document.getElementById("scoreList").innerHTML = ranked.map((id, i) => {
+    const v = VALUES.find(x => x.id === id);
+    if (!scores[id]) scores[id] = 5;
+    return `<div class="score-card">
+      <div class="score-card-header">
+        <span class="score-emoji">${v.emoji}</span>
+        <span class="score-name">${v.label}</span>
+        <span class="score-rank-badge">Priority #${i + 1}</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="1" max="10" step="1" value="${scores[id]}"
+          oninput="scores['${id}']=parseInt(this.value);document.getElementById('sv_${id}').textContent=this.value">
+        <span class="slider-val" id="sv_${id}">${scores[id]}</span>
+      </div>
+      <div class="slider-labels"><span>Not at all</span><span>Completely aligned</span></div>
+    </div>`;
+  }).join("");
+  goScreen(3);
+}
+
+function goResults() {
+  const top = VALUES.find(x => x.id === ranked[0]);
+  document.getElementById("heroTitle").textContent = PROFILES[ranked[0]] || "Your financial profile";
+  document.getElementById("heroSub").textContent =
+    `${ranked.length} values identified · Top priority: ${top.label}`;
+
+  const avgScore = Math.round(ranked.reduce((a, id) => a + (scores[id] || 5), 0) / ranked.length);
+  const topGap = ranked.reduce((worst, id) => {
+    return (scores[id] < (scores[worst] || 10)) ? id : worst;
+  }, ranked[0]);
+  const topGapV = VALUES.find(x => x.id === topGap);
+
+  const scoreLabel = avgScore >= 8 ? "Strong" : avgScore >= 6 ? "Moderate" : "Needs work";
+
+  document.getElementById("metricsRow").innerHTML = [
+    { label: "Top value", value: top.emoji + " " + top.label, note: "Anchors your plan" },
+    { label: "Avg alignment", value: avgScore + " / 10", note: scoreLabel },
+    { label: "Biggest gap", value: topGapV.emoji + " " + topGapV.label, note: scores[topGap] + "/10 score" },
+  ].map(m => `<div class="metric-card">
+    <div class="metric-label">${m.label}</div>
+    <div class="metric-value">${m.value}</div>
+    <div class="metric-note">${m.note}</div>
+  </div>`).join("");
+
+  const maxPct = Math.max(...ranked.map((id, i) => (scores[id] || 5) * (ranked.length - i)));
+  document.getElementById("priorityBars").innerHTML = ranked.map((id, i) => {
+    const v = VALUES.find(x => x.id === id);
+    const weighted = (scores[id] || 5) * (ranked.length - i);
+    const pct = Math.round((weighted / maxPct) * 100);
+    const isTop = i === 0;
+    return `<div class="bar-row">
+      <span class="bar-emoji">${v.emoji}</span>
+      <span class="bar-label">${v.label}</span>
+      <div class="bar-track"><div class="bar-fill ${isTop ? 'gold' : ''}" style="width:${pct}%"></div></div>
+      <span class="bar-score">${scores[id] || 5}/10</span>
+    </div>`;
+  }).join("");
+
+  const top3 = ranked.slice(0, Math.min(3, ranked.length));
+  document.getElementById("gapCheck").innerHTML = top3.map(id => {
+    const v = VALUES.find(x => x.id === id);
+    const s = scores[id] || 5;
+    const aligned = s >= 7;
+    return `<div class="gap-row">
+      <div class="gap-dot ${aligned ? 'aligned' : 'gap'}">${aligned ? '✓' : '!'}</div>
+      <div class="gap-text">
+        <strong>${v.label}</strong> — ${aligned
+          ? `Well aligned at ${s}/10. Keep building on this.`
+          : `Gap identified at ${s}/10. This is a key focus area for your plan.`}
+        <div class="gap-sub">${v.hint}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  goScreen(4);
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll(".bar-fill").forEach(b => { b.style.width = b.style.width; });
+  }, 100);
+}
+
+function restart() {
+  selected = []; ranked = []; scores = {};
+  initGrid();
+  document.getElementById("selCount").textContent = "0";
+  document.getElementById("btn1").disabled = true;
+  goScreen(0);
+}
+
+// Init
+initGrid();
+updateProgress(0);
+document.getElementById("progressWrap").style.display = "none";
+</script>
+</body>
+</html>
